@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Dark on light browser tabs, light on dark ones. -->
+  <style>
+    path { fill: #2b2622; stroke: #2b2622; }
+    @media (prefers-color-scheme: dark) {
+      path { fill: #f3eee8; stroke: #f3eee8; }
+    }
+  </style>
+  <!-- A small play button. The stroke rounds off its corners. -->
+  <path d="M12 9.5v13l10.5-6.5z" stroke-width="3" stroke-linejoin="round" />
+</svg>

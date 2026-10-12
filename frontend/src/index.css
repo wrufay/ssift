@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #fbf5f3;
+  --ink: #031d44;
+  color-scheme: light;
+}
+
+/*
+ * Dark mode: a dusty attic. Warm brownish grey, like old wood in low light,
+ * with text the colour of yellowed paper.
+ */
+:root[data-theme="dark"] {
+  --bg: #2b2622;
+  --ink: #e0d4c0;
+  color-scheme: dark;
+}
+
+/* Expose the tokens to Tailwind, so `bg-bg`, `text-ink`, `font-script` etc. exist. */
+@theme inline {
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-script: "Cedarville Cursive", cursive;
+
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-muted: color-mix(in srgb, var(--ink) 65%, transparent);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}

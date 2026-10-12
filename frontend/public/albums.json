@@ -1,0 +1,47 @@
+[
+  {
+    "id": "1536964024",
+    "title": "Stories",
+    "artist": "Maki Otsuki",
+    "year": 2000,
+    "genre": "J-Pop",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/37/0a/df/370adfc1-d9b3-4242-b37f-d76002959ae3/jacket_MHXX01731B00Z_550.jpg/600x600bb.jpg",
+    "url": "https://music.apple.com/us/album/stories/1536964024?uo=4"
+  },
+  {
+    "id": "76160059",
+    "title": "Take This to Your Grave",
+    "artist": "Fall Out Boy",
+    "year": 2003,
+    "genre": "Alternative",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e0/04/32/e00432f9-c4c7-5807-048e-3a9ecbd37ba7/mzi.exwqxhpg.jpg/600x600bb.jpg",
+    "url": "https://music.apple.com/us/album/take-this-to-your-grave/76160059?uo=4"
+  },
+  {
+    "id": "1443469722",
+    "title": "Rock Angelz",
+    "artist": "Bratz",
+    "year": 2005,
+    "genre": "Rock",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/fd/9e/73/fd9e739b-0cb4-07de-335c-54e13fa107df/00602498829455.rgb.jpg/600x600bb.jpg",
+    "url": "https://music.apple.com/us/album/rock-angelz/1443469722?uo=4"
+  },
+  {
+    "id": "276798235",
+    "title": "Pretty. Odd.",
+    "artist": "Panic! At the Disco",
+    "year": 2008,
+    "genre": "Alternative",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music/f3/46/13/mzi.nhuwgyvm.jpg/600x600bb.jpg",
+    "url": "https://music.apple.com/us/album/pretty-odd/276798235?uo=4"
+  },
+  {
+    "id": "1792040091",
+    "title": "Ultimate Collection",
+    "artist": "Stuart Townend",
+    "year": 2012,
+    "genre": "Christian",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/15/41/e2/1541e2be-6ab7-ad7c-51fc-c4f6239f05b1/5019282331356.png/600x600bb.jpg",
+    "url": "https://music.apple.com/us/album/ultimate-collection/1792040091?uo=4"
+  }
+]

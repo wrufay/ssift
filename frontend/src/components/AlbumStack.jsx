@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { createAlbumScene } from '../three/albumScene'
+import { useCoverColor } from '../hooks/useCoverColor'
 
 // How far (in px) a drag has to travel to count as a swipe, and how little to count as a click.
 const SWIPE_DISTANCE = 40
 const CLICK_DISTANCE = 8
 
-export default function AlbumStack({ albums, theme }) {
+export default function AlbumStack({ albums }) {
   // `index` is the album at the front of the stack.
   const [index, setIndex] = useState(0)
   // Which way the last flip went, so the scene knows which case travels round the stack.
@@ -19,6 +20,8 @@ export default function AlbumStack({ albums, theme }) {
 
   const total = albums.length
   const canFlip = total > 1
+  // The room takes on the colour of whichever album is at the front.
+  const coverColor = useCoverColor(albums[index]?.cover)
 
   // Build the three.js scene once the stage exists, and tear it down with it.
   useEffect(() => {
@@ -27,6 +30,9 @@ export default function AlbumStack({ albums, theme }) {
     scene.current = createAlbumScene(stage.current, albums, {
       background: getComputedStyle(stage.current).getPropertyValue('--bg').trim(),
       reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+      // The scene fades its own background, and the page copies it frame by
+      // frame, so the canvas and the page around it never differ in colour.
+      onBackground: (color) => document.documentElement.style.setProperty('--bg', color),
     })
 
     return () => {
@@ -35,11 +41,9 @@ export default function AlbumStack({ albums, theme }) {
     }
   }, [albums])
 
-  // The scene paints its own background, so it has to be told when the page colour changes.
   useEffect(() => {
-    if (!stage.current) return
-    scene.current?.setBackground(getComputedStyle(stage.current).getPropertyValue('--bg').trim())
-  }, [albums, theme])
+    if (coverColor) scene.current?.setBackground(coverColor)
+  }, [albums, coverColor])
 
   // React owns which album is at the front; the scene just follows.
   useEffect(() => {

@@ -1,19 +1,11 @@
 @import "tailwindcss";
 
+/* Aged paper and dark wood. The background here is only the starting point:
+   it takes on a tint of whichever album is at the front (see coverColor.js). */
 :root {
-  --bg: #fbf5f3;
-  --ink: #031d44;
+  --bg: #f3eee8;
+  --ink: #2b2622;
   color-scheme: light;
-}
-
-/*
- * Dark mode: a dusty attic. Warm brownish grey, like old wood in low light,
- * with text the colour of yellowed paper.
- */
-:root[data-theme="dark"] {
-  --bg: #2b2622;
-  --ink: #e0d4c0;
-  color-scheme: dark;
 }
 
 /* Expose the tokens to Tailwind, so `bg-bg`, `text-ink`, `font-script` etc. exist. */

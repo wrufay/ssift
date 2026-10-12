@@ -15,8 +15,56 @@ const DISC_RADIUS = 6
 export const DISC_HOME_X = BOOKLET_X
 export const DISC_OUT_X = BOOKLET_X + 4.2
 
+// The shadows are soft-edged pictures on flat planes, not shadows the renderer
+// works out: cheaper, and softer than real-time shadows manage. Each picture
+// is this many pixels square, with the dark shape filling SHADOW_CORE of it
+// and the rest left for the blurred edge.
+const SHADOW_PIXELS = 256
+const SHADOW_CORE = 0.7
+// How far a shadow falls from its case: down and to the right, as if lit from the top left.
+const SHADOW_OFFSET = { x: 0.4, y: -0.5 }
+
+// A blurred black rectangle on a see-through background.
+function createCaseShadowTexture() {
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = SHADOW_PIXELS
+  const context = canvas.getContext('2d')
+
+  // The rectangle itself is drawn off the canvas; only its blurred shadow
+  // lands on it. That gets a soft edge without a blur filter.
+  const far = SHADOW_PIXELS * 4
+  const core = SHADOW_PIXELS * SHADOW_CORE
+  const margin = (SHADOW_PIXELS - core) / 2
+  context.shadowColor = 'black'
+  context.shadowBlur = margin / 2
+  context.shadowOffsetX = far
+  context.fillRect(margin - far, margin, core, core)
+  return new THREE.CanvasTexture(canvas)
+}
+
+// A black circle that fades out towards its edge.
+function createDiscShadowTexture() {
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = SHADOW_PIXELS
+  const context = canvas.getContext('2d')
+
+  const half = SHADOW_PIXELS / 2
+  const gradient = context.createRadialGradient(half, half, 0, half, half, half)
+  gradient.addColorStop(0, 'rgb(0 0 0 / 1)')
+  gradient.addColorStop(SHADOW_CORE, 'rgb(0 0 0 / 1)')
+  gradient.addColorStop(1, 'rgb(0 0 0 / 0)')
+  context.fillStyle = gradient
+  context.fillRect(0, 0, SHADOW_PIXELS, SHADOW_PIXELS)
+  return new THREE.CanvasTexture(canvas)
+}
+
 // Geometries and materials that every case shares, so they are only built once.
 export function createCaseAssets() {
+  const textures = {
+    caseShadow: createCaseShadowTexture(),
+    discShadow: createDiscShadowTexture(),
+  }
+
   const geometries = {
     shell: new RoundedBoxGeometry(CASE.width, CASE.height, CASE.depth, 4, 0.15),
     tray: new THREE.BoxGeometry(CASE.width - 0.3, CASE.height - 0.3, 0.45),
@@ -26,6 +74,9 @@ export function createCaseAssets() {
     seam: new THREE.BoxGeometry(0.05, CASE.height - 0.4, 0.02),
     disc: new THREE.RingGeometry(0.75, DISC_RADIUS, 96),
     hub: new THREE.RingGeometry(0.75, 2, 64),
+    // Sized so the dark core of each picture matches the thing casting it.
+    caseShadow: new THREE.PlaneGeometry(CASE.width / SHADOW_CORE, CASE.height / SHADOW_CORE),
+    discShadow: new THREE.PlaneGeometry((DISC_RADIUS * 2) / 0.8, (DISC_RADIUS * 2) / 0.8),
   }
 
   const materials = {
@@ -69,11 +120,24 @@ export function createCaseAssets() {
       side: THREE.DoubleSide,
     }),
     hub: new THREE.MeshStandardMaterial({ color: 0xf2f3f5, metalness: 0.2, roughness: 0.3 }),
+    caseShadow: new THREE.MeshBasicMaterial({
+      map: textures.caseShadow,
+      transparent: true,
+      opacity: 0.4,
+      depthWrite: false,
+    }),
+    discShadow: new THREE.MeshBasicMaterial({
+      map: textures.discShadow,
+      transparent: true,
+      opacity: 0.3,
+      depthWrite: false,
+    }),
   }
 
   const dispose = () => {
     Object.values(geometries).forEach((geometry) => geometry.dispose())
     Object.values(materials).forEach((material) => material.dispose())
+    Object.values(textures).forEach((texture) => texture.dispose())
   }
 
   return { geometries, materials, dispose }
@@ -104,6 +168,16 @@ export function createJewelCase({ geometries, materials }, coverMaterial) {
   disc.add(hub)
   disc.position.set(DISC_HOME_X, 0, 0.1)
 
+  // Shadows lie just behind the case, where the surface it rests on would be.
+  // They land on that surface, and on any case that sits behind this one.
+  const back = -CASE.depth / 2
+  const caseShadow = new THREE.Mesh(geometries.caseShadow, materials.caseShadow)
+  caseShadow.position.set(SHADOW_OFFSET.x, SHADOW_OFFSET.y, back - 0.05)
+  // The disc's shadow is part of the disc, so it slides out with it.
+  const discShadow = new THREE.Mesh(geometries.discShadow, materials.discShadow)
+  discShadow.position.set(SHADOW_OFFSET.x, SHADOW_OFFSET.y, back - 0.06 - disc.position.z)
+  disc.add(discShadow)
+
   // The hinge: a column of ridges on the lid, and the seam where the lid ends.
   const ridgeSpan = CASE.height - 1.2
   for (let i = 0; i < RIDGE_COUNT; i++) {
@@ -115,6 +189,6 @@ export function createJewelCase({ geometries, materials }, coverMaterial) {
   const seam = new THREE.Mesh(geometries.seam, materials.seam)
   seam.position.set(HINGE_X + 0.75, 0, front + 0.015)
 
-  group.add(shell, tray, booklet, gloss, disc, seam)
+  group.add(shell, tray, booklet, gloss, disc, seam, caseShadow)
   return { group, shell, disc }
 }
